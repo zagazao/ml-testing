@@ -1,0 +1,5 @@
+venv/*
+.gitignore
+Readme.MD
+docker-compose.yml
+setup_env.sh
