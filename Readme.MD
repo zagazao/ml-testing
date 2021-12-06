@@ -36,19 +36,37 @@ uvicorn mltest.app:app --reload
         - GPU-Speicher
 
     - Modelleigenschaften
+        - RandomForest
+            - Average Depth
+            - Feature Importance
+            - Number of Trees
         - Robustness
             - Für NN: [RobustBench](https://github.com/RobustBench/robustbench)
             - Für XGB: https://github.com/laudv/veritas ??
             - Für DT: ???
             - SVM: https://github.com/abstract-machine-learning/saver
-
+        - SVM:
+          - TCAT
+          - ξ-α Test-
+          - Ratio: |#supportvector|/|traing_set|
+          - Propensity Score (Joachims)
+          - Robustness - https://arxiv.org/pdf/1206.6389.pdf ?
+          - Anzahl an Stützvektoren
+          - Feature Importance
     - Metriken:
         - Accuracy, Precision, Recall, F1, AUC, ROC, Confusion Matrix, ...
         - MSE, MAE, ...
 
 - Wie wird quantisierung behandelt?
-    - Modell wird submitted -> Model -> [Model8Bit]
+    - Modell wird submitted -> Model -> [Model, Model8Bit]
     - Execute tests for each model..
+
+# "Äußere Schleife"
+- Kreuzprodukt Plattformen x Optimierungen (Pruning, Quanitisierung, andere Formate)
+
+Vorgehen:
+- Generiere alle "candidatemodels"
+- Generiere pipeline für alle modelle ("SELECT")
 
 ###         
 
@@ -80,7 +98,6 @@ resource_tests = [{
 - Task (classification)
 - Framework
 - ModelTyp
-
 
 - Dataset Properties
     - InputShape
@@ -143,3 +160,5 @@ general_meta = ?
 ### Further frameworks
 
 - https://github.com/microsoft/hummingbird
+- https://github.com/sbuschjaeger/fastinference
+- https://treelite.readthedocs.io/en/latest/
