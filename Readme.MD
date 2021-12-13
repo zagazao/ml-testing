@@ -89,7 +89,7 @@ uvicorn mltest.app:app --reload
 ```
 Die API ist [OpenAPI](https://www.openapis.org/) konform und stellt Docs sowie Testmöglichkeiten unter `localhost:8000/docs` bereit. 
 
-Zur Kommunikations aus Python ist es empfehlenswert einen Client zu schreiben, welcher Pythonfunktionen auf die entsprechenden Endpunkte mappt. Ein prototypischer 
+Zur Kommunikation aus Python ist es empfehlenswert einen Client zu schreiben, welcher Pythonfunktionen auf die entsprechenden Endpunkte mappt. Ein prototypischer 
 Client ist in [mltest/my_client.py](mltest/my_client.py) zu finden.
 
 Das restliche Repository besteht aus Laufzeittests für Zufallswälder. Die Idee ist es, ein trainiertes Modell sowie einen Validierungsdatensatz hochzuladen, woraufhin dieses Modell in
@@ -99,6 +99,13 @@ verschiedenen Frameworks mit unterschiedlichen Optimierungsstufen auf seine Lauf
 - FastInference mit verschiedenen Optimierungen
 - Treelite
 
+
+#### Datensätze
+
+Zum Laden und Speichern von Datensätzen könnte sich ein hybrides S3/Mongo-Konzept, inspiriert von MLFlow, eignen. Die Metadaten würden mit einem Verweis auf den Bucket und 
+Dateinamen in einer MongoDB -Collection gespeichert. Die eigentlichen Daten würden in einem S3-Bucket gespeichert. Somit könnten die Metadaten schnell abgefragt werden und die 
+eigentlichen Daten werden erst On-Demand aus dem entsprechenden Bucket gelesen. Eine prototypische Implementierung ist im Verzeichnis
+[mltest/datasets](mltest/datasets) zu finden.
 
 ## Framework
 

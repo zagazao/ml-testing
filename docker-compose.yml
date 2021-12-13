@@ -60,8 +60,8 @@ services:
       /bin/sh -c "
       sleep 5;
       /usr/bin/mc alias set myminio http://minio-s3:9000 storage_user crazy_storage_password;
-      /usr/bin/mc ls myminio | grep jobs || /usr/bin/mc mb myminio/jobs;
-      /usr/bin/mc policy set public myminio/jobs;
+      /usr/bin/mc ls myminio | grep datasets || /usr/bin/mc mb myminio/datasets;
+      /usr/bin/mc policy set public myminio/datasets;
       exit 0;
       "
     networks:
