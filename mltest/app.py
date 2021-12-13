@@ -8,7 +8,7 @@ from fastapi import FastAPI, File, Depends
 from pydantic import BaseModel
 
 from mltest.celery_app import celery_app
-from mltest.thoughts import generate_test_pipeline
+from mltest.some_tests import generate_test_pipeline
 
 app = FastAPI()
 

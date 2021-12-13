@@ -1,7 +1,6 @@
 import os
 
 import minio
-# from pymongo import MongoClient
 from pymongo import MongoClient
 
 

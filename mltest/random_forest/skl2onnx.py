@@ -2,7 +2,7 @@ import os
 import time
 import uuid
 
-from mltest.thoughts import InferenceTimeTest
+from mltest.some_tests import InferenceTimeTest
 
 
 class Skl2OnnxInferenceRFTimeTest(InferenceTimeTest):

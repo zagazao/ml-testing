@@ -17,14 +17,8 @@ from sklearn.metrics import explained_variance_score, max_error, mean_absolute_e
     mean_absolute_percentage_error, r2_score
 
 from mltest.random_forest.base import RFTest, InferenceTimeTest, check_status_code
-# Group Test?
-# Hierarchical
-# we have groups of tests
-# - Each group can summarize its results to an artifact??
 from mltest.random_forest.skl2onnx import Skl2OnnxInferenceRFTimeTest
 
-
-# TODO: Cleanup...
 
 class TreeLiteInferenceTimeTest(InferenceTimeTest):
 
@@ -230,18 +224,11 @@ class RFSklearnRuntimeTest(InferenceTimeTest):
 all_tests = [{
     'test_name': 'RandomForest',
     'test_class': 'RegressionMetricTest',
-    'test_clz': 'mltest.thoughts',
+    'test_clz': 'mltest.some_tests',
     'task': ['regression'],
     'requirements': [],
     'constraints': [],
 }]
-
-# test = find_matching_tests(all_tests)
-
-# Dynamisch
-# pipeline = TestPipeline.from(test)
-
-# Ausführen
 
 
 class RegressionMetricTest(RFTest):
@@ -264,65 +251,6 @@ class RegressionMetricTest(RFTest):
         for metric_name, metric_fn in self.regression_metrics.items():
             result[metric_name] = metric_fn(y_hat, y_test)
         return result
-
-
-class RFBiasVarTest(RFTest):
-
-    def run_test(self, sk_model_obj, x_test, y_test):
-        # https://www.jmlr.org/papers/volume6/brown05a/brown05a.pdf
-
-        # https://docs.google.com/document/d/1rdwzcBU63aHjID0iFsXDYZjWY4BORK8mW1v8Y7yVNRQ/edit
-
-        preds_array = np.empty((sk_model_obj.n_estimators, x_test.shape[0]))
-        for idx, estimator in enumerate(sk_model_obj.estimators_):
-            preds_array[idx, :] = estimator.predict(x_test)
-
-        mean_ensemble_prediction = np.mean(preds_array)
-
-        predictions = sk_model_obj.predict(x_test)
-
-        bias_bar = np.mean(predictions - y_test)
-
-        learner_prediction_mean = preds_array.mean(axis=1)
-
-        bias = np.mean(mean_ensemble_prediction - y_test)
-
-        label_mean = y_test.mean()
-        # What is t??
-        t = label_mean
-        bias_bar = np.mean(learner_prediction_mean - t)
-
-        var_bar = []
-        for i in range(sk_model_obj.n_estimators):
-            inner = np.mean((preds_array[i] - learner_prediction_mean[i]) ** 2)
-            var_bar.append(inner)
-        var_bar = np.mean(var_bar)
-
-        M = sk_model_obj.n_estimators
-        scaling_factor = (1 / ((M - 1) * M))
-
-        inner_val = 0
-        for i in range(M):
-            for j in range(M):
-                if i == j:
-                    continue
-                inner_val += ((preds_array[i] - learner_prediction_mean[i]) * (preds_array[j] - learner_prediction_mean[j])).mean()
-
-        covbar = scaling_factor * inner_val
-
-        mse = mean_squared_error(y_true=y_test, y_pred=predictions)
-
-        print('Bias bar:', bias_bar)
-        print('Var bar:', var_bar)
-        print('cov bar:', covbar)
-
-        return {
-            'bias_bar': bias_bar,
-            'var_bar': var_bar,
-            'covar_bar': covbar,
-            'rescaled_covarbar': (1 - (1 / M)) * covbar,
-            'success': mse < (1 - (1 / M)) * covbar
-        }
 
 
 class TestPipeline(object):
@@ -363,9 +291,8 @@ class SKLearnModelSizeTest(RFTest):
 
 
 def generate_test_pipeline():
-    # Create test pipeline as meta (json)
 
-    #
+    # TODO: Better naming..
 
     test_pipeline = TestPipeline()
     test_pipeline.register(TreeLiteInferenceTimeTest(), 'tree_lite_inference')
@@ -376,9 +303,6 @@ def generate_test_pipeline():
     test_pipeline.register(
         FastInferenceTimeTest(
             name='ifelse_swap', implementation_type='ifelse', optimizer='swap'), 'fast_inference_ifelse_swap')
-
-    # TODO: Optimize w.r.t name
-    # TODO: OnnxToSKlearn
 
     for s in [1024, 2048, 4096]:
         test_pipeline.register(

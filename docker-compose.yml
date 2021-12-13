@@ -13,6 +13,23 @@ services:
     networks:
       - mainnet
 
+  minio-s3:
+    container_name: minio
+    image: minio/minio
+    restart: always
+#     volumes:
+#       - /home/lukas/data/minio/:/data
+    environment:
+      - MINIO_ROOT_USER=storage_user
+      - MINIO_ROOT_PASSWORD=crazy_storage_password
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: server /data --console-address ":9001"
+    user: "${UID}:${GID}"
+    networks:
+      - mainnet
+
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management-alpine
@@ -31,22 +48,6 @@ services:
     networks:
       - mainnet
 
-  minio-s3:
-    container_name: minio
-    image: minio/minio
-    restart: always
-    volumes:
-      - /home/lukas/data/minio/:/data
-    environment:
-      - MINIO_ROOT_USER=storage_user
-      - MINIO_ROOT_PASSWORD=crazy_storage_password
-    ports:
-      - 9000:9000
-      - 9001:9001
-    command: server /data --console-address ":9001"
-    user: "${UID}:${GID}"
-    networks:
-      - mainnet
 
   createbuckets:
     image: minio/mc
@@ -66,7 +67,7 @@ services:
     networks:
       - mainnet
 
-  celery-worker-validation-and-split:
+  celery-worker:
     user: 1000:1000
     depends_on:
       - rabbitmq
@@ -88,38 +89,18 @@ services:
     networks:
       - mainnet
 
-#  celery-worker-train:
-#    depends_on:
-#      - rabbitmq
-#      - redis
-#    build:
-#      context: .
-#      dockerfile: docker/celery-worker/Dockerfile
-#    image: heppe/celery-worker:latest
-#    command: -Q train_queue
-#    env_file:
-#      - dev.env
-#    environment:
-#      - CELERY_BROKER=pyamqp://guest@rabbitmq//
-#      - CELERY_BACKEND=redis://redis
-#      - MINIO_ENDPOINT=minio:9000
-#      - MONGO_DB_HOST=mongo
-#    networks:
-#      - mainnet
-
-#  flower:
-#    image: mher/flower
-#    ports:
-#      - 5555:5555
-#    environment:
-#      - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
-#      - CELERY_BACKEND_URL=redis://redis
-#    networks:
-#      - mainnet
-#    depends_on:
-#      - celery-worker-train
-#      - celery-worker-validation-and-split
-#      - redis
+  flower:
+    image: mher/flower
+    ports:
+      - 5555:5555
+    environment:
+      - CELERY_BROKER_URL=pyamqp://guest@rabbitmq//
+      - CELERY_BACKEND_URL=redis://redis
+    networks:
+      - mainnet
+    depends_on:
+      - celery-worker
+      - redis
 
 networks:
   mainnet:
